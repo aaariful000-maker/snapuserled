@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Click to Show Ad - Gigapub</title>
+  <meta name="description" content="Click to show Gigapub ad. Use this page on GitHub Pages and share link via Telegram bot." />
+  <style>
+    :root{
+      --bg1: #0f172a;
+      --bg2: #4f46e5;
+      --accent1: #ff416c;
+      --accent2: #ff4b2b;
+      --card:#ffffff;
+      --muted:#6b7280;
+    }
+    html,body{height:100%;margin:0;}
+    body{
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: white;
+      padding:28px;
+      box-sizing:border-box;
+    }
+    .wrap{
+      width:100%;
+      max-width:760px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border-radius:14px;
+      padding:28px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      text-align:center;
+      backdrop-filter: blur(6px);
+    }
+    h1{
+      margin:0 0 12px 0;
+      font-size:26px;
+      letter-spacing:0.3px;
+      text-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    }
+    p.lead{
+      margin:0 0 20px 0;
+      color: rgba(255,255,255,0.9);
+      font-size:14px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 26px;
+      border-radius:999px;
+      border: none;
+      font-size:16px;
+      cursor:pointer;
+      font-weight:600;
+      color:white;
+      background: linear-gradient(45deg, var(--accent1), var(--accent2));
+      box-shadow: 0 8px 20px rgba(255,75,75,0.14), inset 0 -1px 0 rgba(0,0,0,0.12);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn[disabled]{ opacity:0.6; cursor:not-allowed; transform:none; box-shadow:none; }
+
+    #adsArea{
+      margin-top:20px;
+      background: var(--card);
+      color: #111827;
+      min-height:250px;
+      border-radius:12px;
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.25);
+      overflow:hidden;
+    }
+    .hint{ color: var(--muted); font-size:13px; margin-top:10px; }
+
+    /* responsive */
+    @media (max-width:520px){
+      .wrap{ padding:18px; }
+      h1{ font-size:20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🚀 Gigapub Ad Viewer</h1>
+    <p class="lead">নীচের বোতামে ক্লিক করলে সাথে সাথে অ্যাড লোড হবে — আপনি এই পেজটি GitHub Pages-এ হোস্ট করে Telegram বটে লিঙ্ক পাঠাতে পারেন।</p>
+
+    <button id="showBtn" class="btn" onclick="showAd()">▶ Click to Show Ad</button>
+
+    <div id="adsArea" aria-live="polite">
+      <div>
+        <div style="font-weight:700; font-size:16px; color:#374151;">এখানে ক্লিক করলে Ad দেখা যাবে...</div>
+        <div class="hint">বিঃদ্রঃ প্রথমবার লোডে কিছু সেকেন্ড সময় লাগতে পারে (নেটওয়ার্ক/রিসোর্স লোড অনুযায়ী)।</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Gigapub script id যদি পরিবর্তন করতে চান, এখানে পরিবর্তন করুন:
+    const GIGAPUB_SRC = "https://ad.gigapub.tech/script?id=1104";
+
+    // একাধিক ক্লিক থেকে প্রতিরোধ করা হবে — একবার ক্লিক করলে বোতন disable হবে
+    function showAd() {
+      const btn = document.getElementById("showBtn");
+      const adsArea = document.getElementById("adsArea");
+
+      // প্রথমে clear করে একটা loading state দেখাই
+      adsArea.innerHTML = '<div style="text-align:center;"><div style="font-weight:700; color:#374151;">অ্যাড লোড হচ্ছে...</div></div>';
+
+      // বোতন disable করে দিই যাতে একাধিক স্ক্রিপ্ট add না হয়
+      btn.disabled = true;
+      btn.textContent = "Loading...";
+
+      // স্ক্রিপ্ট element তৈরি করে DOM-এ অ্যাপেন্ড করি (innerHTML না করে)
+      const s = document.createElement("script");
+      s.src = GIGAPUB_SRC;
+      s.async = true;
+
+      // অনেক কিছুই ad network এ iframe/element যুক্ত করবে; আমরা adsArea এর ভিতরে appenchild করবো
+      // কিছু ad network সরাসরি script tag থেকে document.write/append ব্যবহার করতে পারে,
+      // তাই আমরা একটি কনটেইনার div তৈরী করে সেখানে script যোগ করছি।
+      const wrapper = document.createElement("div");
+      wrapper.style.width = "100%";
+      wrapper.style.height = "100%";
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "center";
+      wrapper.style.justifyContent = "center";
+
+      // Append script into wrapper, then replace adsArea content
+      wrapper.appendChild(s);
+      // মাইন্ড করুন: কিছু ad networks document.write ব্যবহার করলে GitHub Pages static context-এ
+      // কাজ করবে যদি network allow করে। যদি না করে, তখন console এ error দেখা যাবে।
+      adsArea.innerHTML = ""; // পূর্বের লোডিং মেসেজ মুছে ফেলুন
+      adsArea.appendChild(wrapper);
+
+      // Optional: 10 সেকেন্ড পরে বোতন আবার enable করে দিতে চাইলে uncomment করুন
+      // setTimeout(()=>{ btn.disabled = false; btn.textContent = "Click to Show Ad"; }, 10000);
+    }
+  </script>
+</body>
+</html>
